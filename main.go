@@ -43,11 +43,11 @@ var (
 )
 
 func init() {
-	/*	wh := os.Getenv("SLACK_WEBHOOK")
-		if wh == "" {
-			log.Fatal("env SLACK_WEBHOOK not set")
-		}
-		webhook = wh*/
+	wh := os.Getenv("SLACK_WEBHOOK")
+	if wh == "" {
+		log.Fatal("env SLACK_WEBHOOK not set")
+	}
+	webhook = wh
 
 	domains = make(chan string)
 	done = make(chan bool)
