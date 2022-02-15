@@ -36,10 +36,11 @@ type SlackMessage struct {
 }
 
 var (
-	webhook string
-	domains chan string
-	done    chan bool
-	checks  []Check
+	webhook    string
+	configPath string
+	domains    chan string
+	done       chan bool
+	checks     []Check
 )
 
 func init() {
@@ -48,6 +49,12 @@ func init() {
 		log.Fatal("env SLACK_WEBHOOK not set")
 	}
 	webhook = wh
+
+	cp := os.Getenv("CONFIG")
+	if cp == "" {
+		log.Fatal("env CONFIG not set")
+	}
+	configPath = cp
 
 	domains = make(chan string)
 	done = make(chan bool)
@@ -66,7 +73,7 @@ func main() {
 	}
 }
 func read() {
-	file, err := os.Open("domains.txt")
+	file, err := os.Open(configPath + "domains.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -117,6 +124,9 @@ func SendSlackNotification(checks []Check) error {
 			})
 		}
 	}
+	if len(fields) < 1 {
+		return nil
+	}
 	msg := SlackMessage{
 		Attachments: []Attachement{
 			{
@@ -148,5 +158,6 @@ func SendSlackNotification(checks []Check) error {
 	if buf.String() != "ok" {
 		return errors.New("non-ok response returned from Slack")
 	}
+
 	return nil
 }
